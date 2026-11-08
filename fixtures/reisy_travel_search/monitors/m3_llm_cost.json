@@ -1,0 +1,9 @@
+{
+  "id": 3,
+  "name": "REISY LLM cost per search over budget",
+  "type": "query alert",
+  "query": "avg(last_15m):avg:reisy.search.llm_cost_usd{service:travel-service} > 0.1",
+  "message": "LLM cost per search above the 0.10 USD budget. @slack-reisy-oncall",
+  "tags": ["team:reisy", "service:travel-service"],
+  "options": {"thresholds": {"critical": 0.1, "warning": 0.08}}
+}
