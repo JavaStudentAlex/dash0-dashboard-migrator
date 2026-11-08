@@ -90,3 +90,19 @@ class Dash0Client:
         :param rule_id: Id from :func:`check_rule_id`.
         """
         return checked_json(self._http.get(f"/api/alerting/check-rules/{rule_id}"))
+
+    def find_id(self, collection: str, name: str) -> str:
+        """Return the id of the asset named ``name`` from a list endpoint.
+
+        Live Dash0 (checked 2026-11-08) answers a dashboard import and a dashboard GET without
+        any id; only ``GET /api/dashboards`` lists ``id`` and ``name``.
+
+        :param collection: ``"dashboards"`` or ``"alerting/check-rules"``.
+        :param name: Asset name as imported.
+        :raises LookupError: If no listed asset has that name.
+        """
+        listed = checked_json(self._http.get(f"/api/{collection}"))
+        matches = [a["id"] for a in listed if a.get("name") == name]
+        if not matches:
+            raise LookupError(f"no {collection} asset named {name!r} in Dash0")
+        return matches[-1]
