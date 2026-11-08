@@ -13,8 +13,6 @@ from dd2dash0.clients.dash0 import (
     IMPORT_CHECK_RULE_PATH,
     IMPORT_DASHBOARD_PATH,
     Dash0Client,
-    check_rule_id,
-    dashboard_id,
 )
 from dd2dash0.clients.datadog import DatadogClient
 
@@ -65,6 +63,22 @@ def _migrate(args: argparse.Namespace) -> int:
     return 0
 
 
+def _stored_id(asset: dict) -> str | None:
+    """Return the id that Dash0 put into an import answer, if any.
+
+    :param asset: Import answer (check rule: top-level ``id``; dashboard: ``metadata.dash0Extensions.id``).
+    """
+    return asset.get("id") or asset.get("metadata", {}).get("dash0Extensions", {}).get("id")
+
+
+def _stored_name(asset: dict) -> str | None:
+    """Return the name of a stored dashboard (``metadata.name``) or check rule (``name``).
+
+    :param asset: Asset as read back from Dash0.
+    """
+    return asset.get("name") or asset.get("metadata", {}).get("name")
+
+
 def _import(args: argparse.Namespace, dash0_factory: Callable[[str], Dash0Client]) -> int:
     """Import the files written by ``migrate`` into Dash0 and read each asset back.
 
@@ -82,14 +96,15 @@ def _import(args: argparse.Namespace, dash0_factory: Callable[[str], Dash0Client
         return 0
 
     client = dash0_factory(args.dataset)
-    assets = [("dashboard", dashboard["metadata"]["name"], dashboard, client.import_dashboard, dashboard_id, client.get_dashboard)]
-    assets += [("check-rule", r["name"], r, client.import_check_rule, check_rule_id, client.get_check_rule) for r in rules]
+    assets = [("dashboard", "dashboards", dashboard["metadata"]["name"], dashboard, client.import_dashboard, client.get_dashboard)]
+    assets += [("check-rule", "alerting/check-rules", r["name"], r, client.import_check_rule, client.get_check_rule) for r in rules]
     failed = 0
-    for kind, name, payload, put, id_of, get in assets:
-        asset_id = id_of(put(payload))
+    for kind, collection, name, payload, put, get in assets:
+        stored = put(payload)
+        asset_id = _stored_id(stored) or client.find_id(collection, name)
         # A failed read-back is reported per asset so that the remaining assets are still migrated.
         try:
-            status = "ok" if id_of(get(asset_id)) == asset_id else "failed: id mismatch"
+            status = "ok" if _stored_name(get(asset_id)) == name else "failed: name mismatch"
         except APIError as error:
             status = f"failed: {error}"
         failed += status != "ok"
