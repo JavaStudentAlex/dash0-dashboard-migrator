@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "name": "REISY search error rate high",
+  "type": "query alert",
+  "query": "sum(last_5m):sum:reisy.search.errors{service:travel-service}.as_count() / sum:reisy.search.requests{service:travel-service}.as_count() > 0.05",
+  "message": "Search error rate above 5% for 5 minutes. @slack-reisy-oncall",
+  "tags": ["team:reisy", "service:travel-service"],
+  "options": {"thresholds": {"critical": 0.05, "warning": 0.02}, "notify_no_data": false}
+}

@@ -1,0 +1,9 @@
+{
+  "id": 2,
+  "name": "REISY search p95 latency high",
+  "type": "query alert",
+  "query": "avg(last_10m):p95:reisy.search.latency{service:travel-service} by {mode} > 8000",
+  "message": "p95 search latency above 8 s for mode {{mode.name}}. @slack-reisy-oncall",
+  "tags": ["team:reisy", "service:travel-service"],
+  "options": {"thresholds": {"critical": 8000, "warning": 5000}, "require_full_window": false}
+}

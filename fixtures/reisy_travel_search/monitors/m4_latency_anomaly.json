@@ -1,0 +1,9 @@
+{
+  "id": 4,
+  "name": "REISY latency anomaly",
+  "type": "query alert",
+  "query": "avg(last_4h):anomalies(avg:reisy.search.latency{service:travel-service}, 'agile', 2) >= 1",
+  "message": "Search latency deviates from its usual pattern. @slack-reisy-oncall",
+  "tags": ["team:reisy", "service:travel-service"],
+  "options": {"thresholds": {"critical": 1}, "renotify_interval": 60}
+}

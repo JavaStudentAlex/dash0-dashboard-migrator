@@ -1,0 +1,31 @@
+{
+  "title": "REISY travel-service search",
+  "description": "Synthetic, privacy-safe sample of the REISY travel search telemetry.",
+  "layout_type": "ordered",
+  "widgets": [
+    {"id": 1, "definition": {"type": "timeseries", "title": "Search requests by mode",
+      "requests": [{"q": "sum:reisy.search.requests{env:prod,service:travel-service} by {mode}.as_count()", "display_type": "bars"}]}},
+    {"id": 2, "definition": {"type": "query_value", "title": "Search error rate (%)",
+      "requests": [{"response_format": "scalar",
+        "queries": [
+          {"name": "q1", "data_source": "metrics", "query": "sum:reisy.search.errors{service:travel-service}.as_count()", "aggregator": "sum"},
+          {"name": "q2", "data_source": "metrics", "query": "sum:reisy.search.requests{service:travel-service}.as_count()", "aggregator": "sum"}],
+        "formulas": [{"formula": "q1 / q2 * 100"}]}]}},
+    {"id": 3, "definition": {"type": "timeseries", "title": "p95 search latency (ms)",
+      "requests": [{"q": "p95:reisy.search.latency{service:travel-service} by {mode}", "display_type": "line"}]}},
+    {"id": 4, "definition": {"type": "timeseries", "title": "LLM cost per search (USD)",
+      "requests": [{"q": "avg:reisy.search.llm_cost_usd{service:travel-service} by {model}", "display_type": "line"}]}},
+    {"id": 5, "definition": {"type": "toplist", "title": "Provider calls",
+      "requests": [{"q": "top(sum:reisy.search.provider.calls{service:travel-service} by {provider}.as_count(), 10, 'sum', 'desc')"}]}},
+    {"id": 6, "definition": {"type": "timeseries", "title": "AB-MCTS iterations per search",
+      "requests": [{"q": "avg:reisy.search.mcts.iterations{service:travel-service}", "display_type": "line"}]}},
+    {"id": 7, "definition": {"type": "timeseries", "title": "Cache hit ratio",
+      "requests": [{"q": "avg:reisy.cache.hit_ratio{service:travel-service}", "display_type": "line"}]}},
+    {"id": 8, "definition": {"type": "note", "title": "About",
+      "content": "# REISY travel search\nSearch volume, errors, p95 latency, LLM cost (budget 0.10 USD per search) and AB-MCTS effort of the travel-service search agent."}},
+    {"id": 9, "definition": {"type": "log_stream", "title": "Search errors (logs)", "query": "service:travel-service status:error",
+      "columns": ["host", "service"]}},
+    {"id": 10, "definition": {"type": "timeseries", "title": "Latency anomalies",
+      "requests": [{"q": "anomalies(avg:reisy.search.latency{service:travel-service}, 'basic', 2)", "display_type": "line"}]}}
+  ]
+}
