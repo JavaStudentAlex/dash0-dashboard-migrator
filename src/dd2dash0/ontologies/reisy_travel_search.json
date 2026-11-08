@@ -1,0 +1,12 @@
+{
+  "name": "reisy_travel_search",
+  "tag_labels": {"service": "service_name", "env": "deployment_environment_name"},
+  "concepts": [
+    {"datadog_metric": "reisy.search.requests", "datadog_type": "count", "otel_metric_name": "reisy.search.requests", "instrument": "counter", "unit": "{request}", "status": "certified", "provenance": "REISY travel-service instrumentation spec v1"},
+    {"datadog_metric": "reisy.search.errors", "datadog_type": "count", "otel_metric_name": "reisy.search.errors", "instrument": "counter", "unit": "{error}", "status": "certified", "provenance": "REISY travel-service instrumentation spec v1"},
+    {"datadog_metric": "reisy.search.latency", "datadog_type": "distribution", "otel_metric_name": "reisy.search.latency", "instrument": "histogram", "unit": "ms", "status": "certified", "provenance": "REISY travel-service instrumentation spec v1"},
+    {"datadog_metric": "reisy.search.llm_cost_usd", "datadog_type": "gauge", "otel_metric_name": "reisy.search.llm_cost_usd", "instrument": "gauge", "unit": "USD", "status": "certified", "provenance": "REISY travel-service instrumentation spec v1"},
+    {"datadog_metric": "reisy.search.mcts.iterations", "datadog_type": "gauge", "otel_metric_name": "reisy.search.mcts.iterations", "instrument": "gauge", "unit": "{iteration}", "status": "certified", "provenance": "REISY travel-service instrumentation spec v1"},
+    {"datadog_metric": "reisy.search.provider.calls", "datadog_type": "count", "otel_metric_name": "reisy.search.provider.calls", "instrument": "counter", "unit": "{call}", "status": "certified", "provenance": "REISY travel-service instrumentation spec v1"}
+  ]
+}
